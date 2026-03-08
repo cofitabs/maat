@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maat ja pääkaupungit</title>
 
-    <!-- Bootswatch-nimisen Bootstrap-templaten Sandstone-teema -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/sandstone/bootstrap.min.css">     
+    <!-- Bootswatchin sandstone-teema -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/sandstone/bootstrap.min.css">    
     
-    <!-- DataTablesin Bootstrap 5 -integraation CSS -->
+    <!-- Tyylitiedosto omille tyylimäärittelyille -->
+    <link rel="stylesheet" href="tyylit.css"> 
+    
+    <!-- DataTablesin Bootstrap 5 -tyylitiedosto -->
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
-    <!-- DataTablesin responsive-lisäosan CSS -->
     <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
@@ -19,6 +21,25 @@
     <div class="container mt-5">
         <h2 class="mb-4">Maailman maat</h2>
         
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h4>Valtioiden perustiedot helposti</h4>
+                        <p class="mb-0">
+                            Tältä sivulta löydät ajantasaiset tiedot maailman itsenäisistä valtioista. Voit tarkastella maiden lippuja, 
+                            väkilukuja, pääkaupunkeja sekä maanosia. Voit myös lajitella maat nousevaan tai laskevaan järjestykseen sarakkeen perusteella 
+                            tai käyttää hakutoimintoa löytääksesi tietyn maan nopeasti. Hakukriteeriksi käy nimi, pääkaupunki tai maanosa.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-center mt-3 mt-md-0">
+                        <img src="960px-The_World_map.png" alt="Pieni maailmankartta" class="img-fluid rounded">
+                        <small>Antony2001 Greece, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card shadow-sm">
             <div class="card-body">
                 
@@ -33,7 +54,7 @@
                         </tr>
                     </thead>
                     <tbody id="sisalto">
-                        <!-- Haettu data tulee tähän -->
+                        <!-- Data tuodaan tänne -->
                     </tbody>
                 </table>
 
@@ -59,35 +80,54 @@
 
     <script>
     function tulostaTaulukko(data) {
+        const maanosat = {
+            "Europe": "Eurooppa",
+            "North America": "Pohjois-Amerikka",
+            "South America": "Etelä-Amerikka",
+            "Asia": "Aasia",
+            "Africa": "Afrikka",
+            "Oceania": "Oseania",
+            "Antarctica": "Etelämanner"
+        };
+        
         let tiedot = "";
 
-        // Liitetään API:sta tullut data merkkijonoon
+        // Liitetään API:sta tullut data ja taulukon solut merkkijonoon
         for (let i = 0; i < data.length; i++) {
             tiedot += "<tr>" +
-                            `<td>${data[i].name.common}</td>`+
+                            // Käytetään suomenkielistä nimeä jos käännös olemassa, muuten englanninkielistä
+                            `<td>${data[i].translations?.fin?.common || data[i].name.common}</td>`+
                             `<td>${data[i].flag}</td>`+
-                            `<td>${data[i].population}</td>`+
+                            // Asukasluku lajitellaan ilman välilyöntejä, mutta näytetään välilyöntien kanssa
+                            `<td data-sort="${data[i].population}">${data[i].population.toLocaleString('fi-FI')}</td>`+
                             `<td>${data[i].capital}</td>`+
                             "<td>";
-                            // Jos maa kuuluu useampaan kuin yhteen maanosaan, listataan kaikki
+                            // Yksi tai useampi maanosa, jonka alueella maa on
                             for (let j = 0; j < data[i].continents.length; j++) {
-                                tiedot += `${data[i].continents[j]} `;
+                                let continent = data[i].continents[j];
+                                let maanosa = maanosat[continent];
+                                tiedot += maanosa + " ";
                             }
             tiedot += "</td>" +
                     "</tr>";
         }
 
-        // Lisätään rivit HTML-taulukkoon
+        // Lisätään tiedot HTML-taulukkoon
         document.getElementById("sisalto").innerHTML = tiedot;         
 
-        // Alustetaan DataTables viimeiseksi, jotta tiedot ehtivät tulla fetchillä
+        /* Alustetaan DataTables viimeiseksi, jotta tiedot ehtivät tulla fetchillä.
+           Otetaan samalla käyttöön responsiivisuus ja suomenkieliset kontrollit.
+        */
         $('#maatTable').DataTable({
-            responsive: true
+            responsive: true,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/fi.json'
+            }
         });
     }
 
     // Haetaan maadata
-    fetch('https://restcountries.com/v3.1/all?fields=name,flag,population,capital,continents')
+    fetch('https://restcountries.com/v3.1/independent?status=true&fields=name,flag,population,capital,continents,translations')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Verkkovirhe');
