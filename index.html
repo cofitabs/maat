@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maat ja pääkaupungit</title>
 
-    <!-- Bootwatch-nimisen Bootstrap-templaten Sandstone-teema -->
+    <!-- Bootswatch-nimisen Bootstrap-templaten Sandstone-teema -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/sandstone/bootstrap.min.css">     
     
     <!-- DataTablesin Bootstrap 5 -integraation CSS -->
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+    <!-- DataTablesin responsive-lisäosan CSS -->
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
 
@@ -41,14 +44,18 @@
     <!-- Tuodaan JQuery, koska DataTables käyttää sitä -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-    <!-- Tuodaan teemassa käytettävät Bootstrapin Javascript-komponentit -->
+    <!-- Teemassa käytettävät Bootstrapin Javascript-komponentit -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Tuodaan DataTables -->
+    <!-- DataTables -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-    <!-- Tuodaan DataTablesin lisäosa, joka tekee tyylistä yhteensopivan Bootstrap 5:n kanssa -->
+    <!-- DataTablesin lisäosa, joka tekee tyylistä yhteensopivan Bootstrap 5:n kanssa -->
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- DataTablesin responsive-lisäosa -->
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
     function tulostaTaulukko(data) {
@@ -74,7 +81,9 @@
         document.getElementById("sisalto").innerHTML = tiedot;         
 
         // Alustetaan DataTables viimeiseksi, jotta tiedot ehtivät tulla fetchillä
-        $('#maatTable').DataTable();
+        $('#maatTable').DataTable({
+            responsive: true
+        });
     }
 
     // Haetaan maadata
