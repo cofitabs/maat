@@ -1,3 +1,12 @@
 small {
     font-size: 0.7rem;
 }
+
+body {
+    padding-bottom: 120px; 
+}
+
+/* yritetäään vähentää takaisinhyppimistä scrollatessa hakutuloksia */
+.dataTables_wrapper {
+    overflow-anchor: none;
+}
